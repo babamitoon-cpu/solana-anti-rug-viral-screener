@@ -38,6 +38,80 @@ main{padding-top:22px}.panel,.stat{background:linear-gradient(145deg,rgba(19,31,
 @media(max-width:620px){.hero{padding:22px 18px;min-height:0}.hero-orb{width:100px;height:100px;flex-basis:100px;margin:0 2px 0 8px}.orb-ring{inset:0}.ring-two{inset:13px}.orb-core{width:52px;height:52px;border-radius:16px;font-size:24px}.orb-core small{font-size:6px}.orb-label{font-size:6px;padding:4px 5px}.label-top{top:0;right:-5px}.label-bottom{bottom:0;left:-7px}.hero h2{font-size:27px}.hero p{font-size:12px}.hero-chips span{font-size:9px;padding:6px 7px}.source-strip{gap:6px}.source-label{width:100%}}
 @media(prefers-reduced-motion:reduce){*,*:before,*:after{transition:none!important;scroll-behavior:auto!important}}
 
+
+/* Mobile-first vertical results: avoid horizontal scrolling on phones */
+@media(max-width:620px){
+  .tablewrap{overflow:visible;border:0;border-radius:0}
+  table{width:100%;min-width:0;display:block}
+  thead{display:none}
+  tbody{display:block;width:100%}
+  tbody tr:not(.analysis-row){display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0;border:1px solid var(--line);border-radius:12px;overflow:hidden;margin:0 0 10px;background:rgba(14,24,32,.72)}
+  tbody tr:not(.analysis-row) td{display:block;min-width:0;padding:11px 10px;overflow-wrap:anywhere;border-bottom:1px solid rgba(92,126,147,.16)}
+  tbody tr:not(.analysis-row) td:first-child{grid-column:1/-1}
+  tbody tr:not(.analysis-row) td:nth-child(2)::before{content:"UMUR";display:block;color:var(--muted);font-size:9px;letter-spacing:.08em;margin-bottom:4px}
+  tbody tr:not(.analysis-row) td:nth-child(3)::before{content:"MARKET CAP";display:block;color:var(--muted);font-size:9px;letter-spacing:.08em;margin-bottom:4px}
+  tbody tr:not(.analysis-row) td:nth-child(4)::before{content:"LIKUIDITAS";display:block;color:var(--muted);font-size:9px;letter-spacing:.08em;margin-bottom:4px}
+  tbody tr:not(.analysis-row) td:nth-child(5)::before{content:"HOLDER";display:block;color:var(--muted);font-size:9px;letter-spacing:.08em;margin-bottom:4px}
+  tbody tr:not(.analysis-row) td:nth-child(6)::before{content:"SKOR";display:block;color:var(--muted);font-size:9px;letter-spacing:.08em;margin-bottom:4px}
+  tbody tr:not(.analysis-row) td:nth-child(7){grid-column:1/-1}
+  .token{min-width:0;align-items:flex-start}
+  .token small{max-width:calc(100vw - 100px);overflow-wrap:anywhere;word-break:break-word}
+  .analysis-row{display:block;margin:0 0 16px}
+  .analysis-row td{display:block!important;width:100%;padding:0!important;border:0!important}
+  .analysis-card{padding:12px;border:1px solid rgba(92,126,147,.23);border-radius:12px;overflow:hidden}
+  .analysis-head{align-items:flex-start}
+  .analysis-title{overflow-wrap:anywhere}
+  .analysis-grid{grid-template-columns:minmax(0,1fr)!important;gap:8px}
+  .analysis-metric{width:100%;min-width:0}
+  .analysis-metric b{overflow-wrap:anywhere;word-break:break-word}
+  .analysis-note{overflow-wrap:anywhere;word-break:break-word}
+  .analysis-links a,.analysis-links button{max-width:100%;overflow-wrap:anywhere}
+  .empty{display:block!important}
+}
+
+
+/* Requested report-style layout: every token and its analysis flow vertically */
+.tablewrap{overflow:visible!important;border:0!important;border-radius:0!important}
+table{width:100%!important;min-width:0!important;border-collapse:separate!important;border-spacing:0 12px!important;display:block!important}
+thead{display:none!important}
+tbody{display:block!important;width:100%!important}
+tbody tr:not(.analysis-row){display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;width:100%!important;border:1px solid var(--line)!important;border-radius:14px!important;overflow:hidden!important;background:linear-gradient(145deg,rgba(19,31,42,.96),rgba(12,20,28,.98))!important;margin:0!important}
+tbody tr:not(.analysis-row) td{display:block!important;min-width:0!important;width:auto!important;padding:11px!important;overflow-wrap:anywhere!important;word-break:break-word!important;border-bottom:1px solid rgba(92,126,147,.16)!important}
+tbody tr:not(.analysis-row) td:first-child{grid-column:1/-1!important}
+tbody tr:not(.analysis-row) td:nth-child(2)::before{content:"UMUR PAIR";display:block;color:var(--muted);font-size:9px;letter-spacing:.08em;margin-bottom:4px}
+tbody tr:not(.analysis-row) td:nth-child(3)::before{content:"MARKET CAP";display:block;color:var(--muted);font-size:9px;letter-spacing:.08em;margin-bottom:4px}
+tbody tr:not(.analysis-row) td:nth-child(4)::before{content:"LIKUIDITAS";display:block;color:var(--muted);font-size:9px;letter-spacing:.08em;margin-bottom:4px}
+tbody tr:not(.analysis-row) td:nth-child(5)::before{content:"HOLDER";display:block;color:var(--muted);font-size:9px;letter-spacing:.08em;margin-bottom:4px}
+tbody tr:not(.analysis-row) td:nth-child(6)::before{content:"SKOR PASAR";display:block;color:var(--muted);font-size:9px;letter-spacing:.08em;margin-bottom:4px}
+tbody tr:not(.analysis-row) td:nth-child(7){grid-column:1/-1!important}
+.analysis-row{display:block!important;width:100%!important;margin:0 0 18px!important}
+.analysis-row td{display:block!important;width:100%!important;padding:0!important;border:0!important}
+.analysis-card{padding:13px!important;border:1px solid rgba(92,126,147,.28)!important;border-radius:14px!important;overflow:hidden!important}
+.analysis-grid{grid-template-columns:minmax(0,1fr)!important;gap:8px!important}
+.analysis-metric{width:100%!important;min-width:0!important}
+.analysis-metric b{overflow-wrap:anywhere!important;word-break:break-word!important}
+.analysis-note{overflow-wrap:anywhere!important;word-break:break-word!important}
+.analysis-links{display:flex!important;flex-direction:column!important;align-items:stretch!important}
+.analysis-links a,.analysis-links button{width:100%!important;text-align:center!important;overflow-wrap:anywhere!important}
+.token{min-width:0!important;align-items:flex-start!important}
+.token small{max-width:calc(100vw - 105px)!important;overflow-wrap:anywhere!important;word-break:break-word!important}
+.empty{display:block!important;grid-column:1/-1!important}
+@media(min-width:621px){
+ .analysis-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+}
+@media(max-width:380px){
+ tbody tr:not(.analysis-row){grid-template-columns:minmax(0,1fr)!important}
+ tbody tr:not(.analysis-row) td:first-child,tbody tr:not(.analysis-row) td:nth-child(7){grid-column:1!important}
+}
+
+
+/* Featured meme coin image: updated from the highest-ranked token after each scan. */
+.hero-coin-wrap{width:min(290px,70vw);aspect-ratio:1;position:relative;border-radius:28px;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle at 50% 45%,rgba(57,224,172,.18),rgba(9,20,27,.2) 62%);border:1px solid rgba(57,224,172,.28);box-shadow:0 0 42px rgba(57,224,172,.12);overflow:hidden}
+.hero-coin-img{width:72%;height:72%;object-fit:contain;border-radius:50%;filter:drop-shadow(0 12px 25px rgba(0,0,0,.4));display:none}
+.hero-coin-fallback{font-size:78px;color:var(--accent,#39e0ac);font-weight:800}
+.hero-coin-caption{position:absolute;bottom:12px;left:12px;right:12px;text-align:center;font-size:11px;letter-spacing:1.2px;color:#c6d9dd;text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+@media(max-width:700px){.hero-coin-wrap{width:190px}.hero-coin-fallback{font-size:58px}.hero-orb{min-height:210px}}
+
 </style>
 </head>
 <body>
@@ -48,9 +122,9 @@ main{padding-top:22px}.panel,.stat{background:linear-gradient(145deg,rgba(19,31,
 <main>
  <section class="hero panel">
   <div class="hero-copy"><div class="eyebrow"><span class="live-dot"></span> SOLANA MEMECOIN INTELLIGENCE</div><h2>Catch momentum.<br><em>Filter the risk.</em></h2><p>Market discovery, risk gates, and social trend status in one place. No wallet connection. No automatic trades.</p><div class="hero-chips"><span>◈ Market scanner</span><span>⬡ Anti-RUG gates</span><span>◎ Social signals</span></div></div>
-  <div class="hero-orb"><div class="orb-ring ring-one"></div><div class="orb-ring ring-two"></div><div class="orb-core">◎<small>RADAR</small></div><div class="orb-label label-top">RISK CHECK</div><div class="orb-label label-bottom">TREND WATCH</div></div>
+  <div class="hero-orb"><div class="hero-coin-wrap"><div class="orb-ring ring-one"></div><div class="orb-ring ring-two"></div><span id="heroCoinFallback" class="hero-coin-fallback">◎</span><img id="heroCoinImg" class="hero-coin-img" alt="Logo token yang sedang dipantau" referrerpolicy="no-referrer" onerror="this.style.display='none';document.getElementById('heroCoinFallback').style.display='block'"><div id="heroCoinCaption" class="hero-coin-caption">MENUNGGU HASIL SCAN</div></div><div class="orb-label label-top">TOP CANDIDATE</div><div class="orb-label label-bottom">TOKEN LIVE</div></div>
  </section>
- <div class="source-strip"><span class="source-label">DATA SOURCES</span><span class="source-chip"><i class="source-dot market"></i> DEX Screener <b>PUBLIC</b></span><span class="source-chip"><i class="source-dot unknown-dot"></i> X <b>UNKNOWN</b></span><span class="source-chip"><i class="source-dot unknown-dot"></i> TikTok <b>UNKNOWN</b></span><span class="source-chip"><i class="source-dot partial-dot"></i> On-chain <b>PARTIAL</b></span></div>
+ <div class="source-strip"><span class="source-label">DATA SOURCES</span><span class="source-chip"><i class="source-dot market"></i> DEX Screener <b>FREE API</b></span><span class="source-chip"><i class="source-dot unknown-dot"></i> X <b>UNKNOWN</b></span><span class="source-chip"><i class="source-dot unknown-dot"></i> TikTok <b>UNKNOWN</b></span><span class="source-chip"><i class="source-dot partial-dot"></i> On-chain <b>PARTIAL</b></span></div>
  <div class="notice"><strong>Mode aman:</strong> screener dan sinyal saja — tidak ada wallet, private key, auto-buy, atau auto-sell. Data risiko yang tidak tersedia ditandai UNKNOWN dan tidak boleh dianggap lolos.</div>
  <section class="stats">
   <div class="stat"><span>Pair terpantau</span><strong id="statSeen">—</strong><small>Pair Solana dari sumber discovery</small></div>
@@ -141,6 +215,7 @@ async function scan(){
    if(!old||Number(p.liquidity?.usd||0)>Number(old.liquidity?.usd||0))best.set(key,p);
   }
   allPairs=[...best.values()].filter(p=>ageMinutes(p)!==null&&ageMinutes(p)>=0&&ageMinutes(p)<=1440);
+  updateHeroCoin();
   render();
   $('lastUpdate').textContent='Update '+new Date().toLocaleTimeString();
   $('status').textContent='Scan selesai · '+allPairs.length+' pair dengan umur ≤24 jam';
@@ -148,6 +223,15 @@ async function scan(){
   $('status').textContent='Gagal mengambil data';
   $('rows').innerHTML='<tr><td colspan="7" class="empty">Gagal mengambil data API. Coba lagi nanti. Detail: '+escapeHtml(e.message)+'</td></tr>';
  }finally{btn.disabled=false}
+}
+function updateHeroCoin(){
+ const candidates=[...allPairs].sort((a,b)=>scorePair(b)-scorePair(a));
+ const p=candidates[0];
+ const img=$('heroCoinImg'), fallback=$('heroCoinFallback'), caption=$('heroCoinCaption');
+ if(!p){img.style.display='none';fallback.style.display='block';caption.textContent='BELUM ADA TOKEN';return}
+ const logo=p.info?.imageUrl || p.icon || '';
+ caption.textContent=(p.baseToken?.symbol||p.baseToken?.name||'TOKEN')+' · KANDIDAT TERATAS';
+ if(logo){img.src=logo;img.style.display='block';fallback.style.display='none'}else{img.removeAttribute('src');img.style.display='none';fallback.style.display='block'}
 }
 function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 function applyFilters(){render()}
@@ -203,13 +287,13 @@ function render(){
   '<div class="analysis-metric"><span>Perubahan 5 menit</span><b>'+change5+'</b></div>'+
   '<div class="analysis-metric"><span>Beli / Jual 1 jam</span><b>'+short(buys)+' / '+short(sells)+'</b></div>'+
   '<div class="analysis-metric"><span>Rasio jumlah transaksi</span><b>'+buySell+'</b></div>'+
-  '<div class="analysis-metric"><span>Holder unik</span><b>UNKNOWN</b></div>'+
-  '<div class="analysis-metric"><span>Top 10 / bundle / sniper</span><b>UNKNOWN</b></div></div>'+
+  '<div class="analysis-metric"><span>Holder unik</span><b>UNKNOWN · perlu API holder</b></div>'+
+  '<div class="analysis-metric"><span>Top 10 holder / bundle / sniper</span><b>UNKNOWN · belum terverifikasi</b></div></div>'+
   '<div class="analysis-note"><strong>Interpretasi otomatis:</strong><ul style="margin:5px 0 0;padding-left:18px">'+notes+'</ul><div style="margin-top:6px">Skor pasar indikatif '+score+'/100; bukan skor keamanan. Pair umur '+Math.floor(age)+' menit. FDV/market cap berasal dari data pair publik yang tersedia.</div></div>'+
   '<div class="analysis-grid" style="margin-top:8px">'+
   '<div class="analysis-metric"><span>Mint / freeze authority</span><b>UNKNOWN</b></div><div class="analysis-metric"><span>Keamanan likuiditas</span><b>UNKNOWN</b></div><div class="analysis-metric"><span>Dev reputation</span><b>UNKNOWN</b></div><div class="analysis-metric"><span>X / TikTok viral</span><b>NOT SCORED</b></div></div>'+
   '<div class="analysis-links"><a href="'+escapeHtml(url)+'" target="_blank" rel="noopener">Buka DEX Screener ↗</a><a href="'+escapeHtml(solscan)+'" target="_blank" rel="noopener">Buka token di Solscan ↗</a><button class="ghost smallbtn" onclick="copyMint(&quot;'+escapeHtml(mint)+'&quot;)">Salin contract address</button></div>'+
-  '<div class="details" style="margin-top:8px">Status: market filter dapat dievaluasi dari data yang tersedia, tetapi belum bisa disebut LOLOS FINAL. Holder, 20 pembeli pertama, bundle, sniper, otoritas mint/freeze, creator/dev, dan likuiditas harus diverifikasi oleh sumber analitik tambahan.</div></div></td></tr>';
+  '<div class="details" style="margin-top:8px">Status: market filter dapat dievaluasi dari data yang tersedia, tetapi belum bisa disebut LOLOS FINAL. Holder count, top 10 holder, 20 pembeli pertama, bundle, sniper, otoritas mint/freeze, creator/dev, dan keamanan likuiditas harus diverifikasi oleh sumber analitik tambahan. UNKNOWN bukan berarti lolos.</div></div></td></tr>';
  }).join('');
 }
 $('maxAge').addEventListener('change',applyFilters);
