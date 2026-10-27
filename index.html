@@ -81,7 +81,7 @@ main{padding-top:22px}.panel,.stat{background:linear-gradient(145deg,rgba(19,31,
   <section class="panel">
    <div class="toolbar"><h2>Kandidat token</h2><span class="status" id="status">Siap scan</span></div>
    <div class="tablewrap"><table><thead><tr><th>Token</th><th>Umur</th><th>Market cap</th><th>Likuiditas</th><th>Holder</th><th>Skor</th><th>Status</th></tr></thead><tbody id="rows"><tr><td colspan="7" class="empty">Tekan “Scan sekarang” untuk mengambil data pasar.</td></tr></tbody></table></div>
-   <div class="foot">Sumber market: DEX Screener public API. Discovery berbasis token profile terbaru, jadi bukan seluruh token yang baru dibuat. Data holder/bundle/sniper/pembeli awal memerlukan indexer atau penyedia analitik tambahan.</div>
+   <div class="foot">Sumber market: DEX Screener public API. Discovery berbasis token profile terbaru, jadi bukan seluruh token yang baru dibuat. Semua pair hasil scan ditampilkan; status menunjukkan filter yang lolos/gagal. Data holder/bundle/sniper/pembeli awal memerlukan indexer atau penyedia analitik tambahan.</div>
   </section>
  </div>
  <section class="panel" style="margin-top:16px">
@@ -154,19 +154,27 @@ function applyFilters(){render()}
 function copyMint(value){if(!value){alert('Contract address belum tersedia');return}if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(value).then(()=>alert('Contract address disalin')).catch(()=>prompt('Salin contract address:',value))}else{prompt('Salin contract address:',value)}}
 function render(){
  const minMc=Number($('minMc').value||0), minLiq=Number($('minLiq').value||0), minH=Number($('minHolders').value||0), maxAge=Number($('maxAge').value||60), minScore=Number($('minScore').value||75);
- const rows=allPairs.map(p=>({p,age:ageMinutes(p),mc:Number(p.marketCap??0),liq:Number(p.liquidity?.usd||0),score:scorePair(p)}))
- .filter(x=>x.age!==null&&x.age<=maxAge&&x.mc>=minMc&&x.liq>=minLiq)
+ // Tampilkan semua pair hasil discovery agar tabel tidak kosong hanya karena filter ketat.
+ // Status PASS/FAIL ditampilkan per token; UNKNOWN tetap bukan berarti aman.
+ const rows=allPairs.map(p=>({p,age:ageMinutes(p),mc:Number(p.marketCap??p.fdv??0),liq:Number(p.liquidity?.usd||0),score:scorePair(p)}))
+ .filter(x=>x.age!==null&&x.age>=0)
  .sort((a,b)=>b.score-a.score);
+ const marketPassCount=rows.filter(x=>x.age<=maxAge&&x.mc>=minMc&&x.liq>=minLiq).length;
  $('statSeen').textContent=allPairs.length;
- $('statMarket').textContent=rows.length;
- $('statScore').textContent=rows.filter(x=>x.score>=minScore).length;
+ $('statMarket').textContent=marketPassCount;
+ $('statScore').textContent=rows.filter(x=>x.age<=maxAge&&x.mc>=minMc&&x.liq>=minLiq&&x.score>=minScore).length;
  // Risk gates are intentionally UNKNOWN until a trusted holder/trader analytics provider is configured.
  $('statAlert').textContent='0';
- if(!rows.length){$('rows').innerHTML='<tr><td colspan="7" class="empty">Belum ada pair yang memenuhi filter pasar. Coba scan ulang nanti.</td></tr>';return}
+ if(!rows.length){$('rows').innerHTML='<tr><td colspan="7" class="empty">Belum ada pair yang berhasil diambil dari API. Coba scan ulang nanti.</td></tr>';return}
  $('rows').innerHTML=rows.map(({p,age,mc,liq,score})=>{
   const h='UNKNOWN';
-  const status=score>=minScore?'MARKET PASS · RISK UNKNOWN':'SKOR DI BAWAH BATAS';
-  const statusClass=score>=minScore?'unknown':'fail';
+  const marketPass=age<=maxAge&&mc>=minMc&&liq>=minLiq;
+  const failed=[];
+  if(age>maxAge) failed.push('umur');
+  if(mc<minMc) failed.push('market cap');
+  if(liq<minLiq) failed.push('likuiditas');
+  const status=marketPass?(score>=minScore?'MARKET PASS · RISK UNKNOWN':'FILTER PASS · SKOR RENDAH'):'FILTER FAIL · '+failed.join(', ');
+  const statusClass=marketPass?'unknown':'fail';
   const url=p.url||('https://dexscreener.com/solana/'+p.pairAddress);
   const mint=p.baseToken?.address||'';
   const icon=p.info?.imageUrl;
@@ -185,7 +193,7 @@ function render(){
   const notes=marketNotes.map(x=>'<li>'+escapeHtml(x)+'</li>').join('');
   const solscan=mint?'https://solscan.io/token/'+encodeURIComponent(mint):'https://solscan.io';
   return '<tr><td><div class="token">'+av+'<div><b><a href="'+escapeHtml(url)+'" target="_blank" rel="noopener">'+escapeHtml(p.baseToken?.symbol||'Unknown')+' ($'+escapeHtml(p.baseToken?.symbol||'UNKNOWN')+')</a></b><small>'+escapeHtml(p.baseToken?.name||'')+'</small><small>'+escapeHtml(mint)+'</small></div></div></td>'+
-  '<td>'+Math.max(0,Math.floor(age))+'m</td><td>'+mcText+'</td><td>'+liqText+'</td><td><span class="pill unknown">'+h+'</span></td>'+
+  '<td>'+Math.floor(age)+'m</td><td>'+mcText+'</td><td>'+liqText+'</td><td><span class="pill unknown">'+h+'</span></td>'+
   '<td><b>'+score+'/100</b><div class="progress"><span style="width:'+score+'%"></span></div></td><td><span class="pill '+statusClass+'">'+status+'</span><div class="details">Final risk checks incomplete</div></td></tr>'+
   '<tr class="analysis-row"><td colspan="7"><div class="analysis-card"><div class="analysis-head"><span class="analysis-title">ANALISIS DETAIL · '+escapeHtml(p.baseToken?.symbol||'TOKEN')+'</span><span class="pill unknown">DEV: UNKNOWN · SOSIAL: UNKNOWN</span></div>'+
   '<div class="analysis-grid">'+
