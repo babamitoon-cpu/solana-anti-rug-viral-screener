@@ -1,888 +1,694 @@
-
 <!DOCTYPE html>
 <html lang="id">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#f7faf8">
-<title>SOLANA RADAR PRO — Meme Coin Screener</title>
+<title>Solana Radar Pro</title>
+
 <style>
 :root {
-  --bg:#f7faf8; --card:#fff; --ink:#14251d;
-  --muted:#718078; --green:#16a36a; --line:#e1eae4;
-  --red:#c53d46; --amber:#a66b09;
+  --bg: #f5f7f4;
+  --card: #ffffff;
+  --ink: #17231c;
+  --muted: #68766d;
+  --green: #18794e;
+  --line: #dfe7e0;
 }
-*{box-sizing:border-box}
-body{
-  margin:0;background:var(--bg);color:var(--ink);
-  font:15px/1.55 Arial,sans-serif
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  color: var(--ink);
+  background: var(--bg);
 }
-header{
-  max-width:1120px;margin:auto;padding:20px 18px;
-  display:flex;align-items:center;justify-content:space-between;gap:12px
+
+/* HERO BACKGROUND */
+.hero {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  text-align: center;
+  padding: 45px 16px 35px;
+  background: linear-gradient(135deg, #f9fbf8, #e8f3e9);
+  border-bottom: 1px solid var(--line);
 }
-.brand{font-weight:900;letter-spacing:-.5px;font-size:19px}
-.brand span{color:var(--green)}
-.pill{border:1px solid var(--line);padding:6px 10px;
-  border-radius:99px;font-size:12px;color:var(--muted)}
-main{max-width:1120px;margin:auto;padding:0 18px 40px}
-.hero{
-  position:relative;overflow:hidden;background:#eaf6ef;
-  border:1px solid #dcece1;border-radius:24px;
-  padding:35px 24px 28px;margin:6px 0 20px
+
+.coin-bg {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  overflow: hidden;
 }
-.hero:before{
-  content:"";position:absolute;inset:0;pointer-events:none;
-  opacity:.12;background-image:
-  url("https://assets.coingecko.com/coins/images/11939/large/shiba.png"),
-  url("https://assets.coingecko.com/coins/images/29850/large/pepe-token.jpeg"),
-  url("https://assets.coingecko.com/coins/images/36440/large/popcat.png"),
-  url("https://assets.coingecko.com/coins/images/35494/large/pengu.png");
-  background-size:100px,95px,90px,90px;
-  background-position:5% 20%,90% 12%,78% 88%,20% 90%;
-  background-repeat:no-repeat
+
+.coin {
+  position: absolute;
+  width: clamp(65px, 12vw, 125px);
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: rgba(255,255,255,.6);
+  border: 1px solid rgba(50,90,60,.10);
+  box-shadow: 0 8px 30px rgba(20,60,30,.06);
+  opacity: .24;
+  overflow: hidden;
 }
-.hero>*{position:relative}
-.eyebrow{font-size:12px;font-weight:800;letter-spacing:1.6px;color:#168455}
-h1{font-size:clamp(30px,6vw,52px);line-height:1.08;
-  letter-spacing:-1.7px;margin:12px 0}
-h1 span{color:var(--green)}
-.sub{max-width:650px;color:#52685b;margin:0 0 22px}
-.scanbar{display:flex;gap:10px;flex-wrap:wrap}
-input{
-  flex:1;min-width:220px;padding:14px;border:1px solid #d4e2d8;
-  border-radius:12px;background:#fff;font-size:14px;outline-color:var(--green)
+
+.coin img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  padding: 7px;
 }
-button{
-  border:0;border-radius:12px;padding:13px 18px;
-  background:var(--green);color:white;font-weight:800;cursor:pointer
+
+.coin .fallback {
+  display: none;
+  font-size: clamp(30px, 5vw, 55px);
 }
-button:disabled{opacity:.55;cursor:wait}
-button.secondary{background:#edf5ef;color:#28583f;border:1px solid var(--line)}
-.note{font-size:12px;color:var(--muted);margin-top:12px}
-.section-head{display:flex;align-items:center;justify-content:space-between;
-  gap:12px;flex-wrap:wrap;margin:25px 0 12px}
-h2{font-size:18px;margin:0}
-.muted{color:var(--muted);font-size:12px}
-.grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
-.card{background:var(--card);border:1px solid var(--line);
-  border-radius:16px;padding:17px;min-width:0}
-.metric-label{font-size:12px;color:var(--muted)}
-.metric{font-size:25px;font-weight:900;letter-spacing:-.7px;
-  margin:7px 0;overflow-wrap:anywhere}
-.metric-detail{font-size:11px;color:var(--muted)}
-.panel{background:white;border:1px solid var(--line);
-  border-radius:16px;padding:18px;margin-top:14px}
-.status{padding:11px 13px;border-radius:11px;background:#edf5ef;
-  color:#315a42;font-size:13px;overflow-wrap:anywhere}
-.status.error{background:#fff0f0;color:var(--red)}
-.status.warn{background:#fff7e7;color:#81540c}
-.data-row{display:flex;justify-content:space-between;gap:14px;
-  padding:12px 0;border-bottom:1px solid var(--line)}
-.data-row:last-child{border-bottom:0}
-.data-row strong{text-align:right;overflow-wrap:anywhere}
-a{color:#148455;overflow-wrap:anywhere}
-.small-btn{font-size:12px;padding:8px 10px}
-.token-list{display:grid;gap:10px}
-.token-item{display:flex;justify-content:space-between;align-items:center;
-  gap:12px;padding:13px;border:1px solid var(--line);border-radius:12px}
-.token-item strong{display:block;overflow-wrap:anywhere}
-.token-item .muted{overflow-wrap:anywhere}
-.scorebar{height:8px;background:#e9efeb;border-radius:99px;overflow:hidden}
-.scorefill{height:100%;background:var(--green);width:0}
-.footer{font-size:12px;color:var(--muted);text-align:center;margin:30px 0 0}
-code{overflow-wrap:anywhere}
-@media(max-width:760px){
- .grid{grid-template-columns:repeat(2,minmax(0,1fr))}
- .hero{padding:27px 18px}
- .metric{font-size:22px}
+
+.coin.failed img { display: none; }
+.coin.failed .fallback { display: block; }
+
+.coin.shiba { top: 5%; left: 5%; transform: rotate(-12deg); }
+.coin.pepe { bottom: 4%; left: 27%; transform: rotate(9deg); }
+.coin.popcat { top: 4%; right: 27%; transform: rotate(10deg); }
+.coin.pengu { bottom: 5%; right: 5%; transform: rotate(-8deg); }
+
+.coin.doge { top: 38%; left: 48%; width: 70px; }
+.coin.sol { top: 12%; left: 68%; width: 60px; }
+
+.hero-content {
+  position: relative;
+  z-index: 1;
+  max-width: 760px;
+  margin: auto;
 }
-@media(max-width:380px){
- .grid{grid-template-columns:1fr}
+
+h1 {
+  margin: 0;
+  font-size: clamp(29px, 5vw, 45px);
+  letter-spacing: -1px;
+}
+
+.subtitle {
+  max-width: 650px;
+  margin: 12px auto 0;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+.wrap {
+  max-width: 1100px;
+  margin: auto;
+  padding: 22px 14px 45px;
+}
+
+.panel, .token {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  padding: 18px;
+  box-shadow: 0 5px 20px rgba(20,50,30,.04);
+}
+
+.controls {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+input, button {
+  font: inherit;
+  border-radius: 11px;
+  padding: 12px 14px;
+}
+
+input {
+  flex: 1;
+  min-width: 220px;
+  border: 1px solid #cbd8ce;
+}
+
+button {
+  border: 0;
+  background: var(--green);
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+button:disabled { opacity: .6; }
+
+.hint, .small, .foot {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+#status {
+  margin-top: 12px;
+  color: var(--muted);
+  overflow-wrap: anywhere;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 11px;
+  margin-top: 17px;
+}
+
+.metric {
+  min-width: 0;
+  border: 1px solid var(--line);
+  border-radius: 13px;
+  padding: 13px;
+}
+
+.label { color: var(--muted); font-size: 12px; }
+.value { font-size: 21px; font-weight: bold; margin-top: 5px; overflow-wrap: anywhere; }
+.note { color: var(--muted); font-size: 12px; margin-top: 4px; }
+
+.tokenhead {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+h2 { font-size: 21px; margin: 0; }
+.sectiontitle { margin: 22px 0 8px; font-size: 17px; }
+
+.pill {
+  display: inline-block;
+  border-radius: 999px;
+  padding: 5px 10px;
+  background: #e9f5ed;
+  color: #17643f;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.warn { background: #fff4e5; color: #8a4b00; }
+.bad { background: #fdecea; color: #a42318; }
+
+.holderrow {
+  display: grid;
+  grid-template-columns: minmax(0,1fr) auto;
+  gap: 12px;
+  padding: 8px 0;
+  border-bottom: 1px solid #eef1ee;
+  font-size: 13px;
+}
+
+.addr { overflow-wrap: anywhere; }
+.foot { margin-top: 16px; }
+.hide { display: none; }
+.error { color: #b42318; }
+
+@media(max-width:760px) {
+  .grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
+  .value { font-size: 18px; }
+  .hero { padding-top: 35px; }
+}
+
+@media(max-width:420px) {
+  .panel, .token { padding: 13px; }
+  .coin { opacity: .20; }
 }
 </style>
 </head>
+
 <body>
-<header>
-  <div class="brand">🟢 SOLANA <span>RADAR PRO</span></div>
-  <div class="pill">LIVE DATA · SOLANA</div>
+
+<header class="hero">
+  <div class="coin-bg" aria-hidden="true">
+
+    <div class="coin shiba">
+      <img src="https://assets.coingecko.com/coins/images/11939/large/shiba.png"
+           alt="" onerror="this.parentElement.classList.add('failed')">
+      <span class="fallback">🐕</span>
+    </div>
+
+    <div class="coin pepe">
+      <img src="https://assets.coingecko.com/coins/images/29850/large/pepe-token.jpeg"
+           alt="" onerror="this.parentElement.classList.add('failed')">
+      <span class="fallback">🐸</span>
+    </div>
+
+    <div class="coin popcat">
+      <img src="https://assets.coingecko.com/coins/images/33760/large/popcat.png"
+           alt="" onerror="this.parentElement.classList.add('failed')">
+      <span class="fallback">🐱</span>
+    </div>
+
+    <div class="coin pengu">
+      <img src="https://assets.coingecko.com/coins/images/52622/large/PUDGY_PENGUINS.png"
+           alt="" onerror="this.parentElement.classList.add('failed')">
+      <span class="fallback">🐧</span>
+    </div>
+
+    <div class="coin doge">
+      <img src="https://assets.coingecko.com/coins/images/5/large/dogecoin.png"
+           alt="" onerror="this.parentElement.classList.add('failed')">
+      <span class="fallback">Ð</span>
+    </div>
+
+    <div class="coin sol">
+      <img src="https://assets.coingecko.com/coins/images/4128/large/solana.png"
+           alt="" onerror="this.parentElement.classList.add('failed')">
+      <span class="fallback">◎</span>
+    </div>
+
+  </div>
+
+  <div class="hero-content">
+    <h1>Solana Radar Pro</h1>
+    <p class="subtitle">
+      Meme coin screener untuk membaca data market dan holder on-chain.
+      Skor merupakan indikator awal, bukan jaminan keamanan atau profit.
+    </p>
+  </div>
 </header>
 
-<main>
-  <section class="hero">
-    <div class="eyebrow">MEME COIN INTELLIGENCE</div>
-    <h1>Scan smarter.<br><span>Spot the risk.</span></h1>
-    <p class="sub">
-      Periksa holder, konsentrasi supply, kandidat wallet Dev,
-      likuiditas, dan aktivitas pasar token Solana.
-    </p>
-    <div class="scanbar">
-      <input id="mintInput" placeholder="Masukkan alamat mint token Solana"
-        autocomplete="off" spellcheck="false">
-      <button id="scanBtn">SCAN TOKEN ↗</button>
-    </div>
-    <div class="note">
-      Data langsung dari API publik. Hasil analisis bukan jaminan keamanan
-      atau rekomendasi investasi.
-    </div>
-  </section>
-
-  <div id="status" class="status">
-    Masukkan alamat mint untuk memulai scan.
-  </div>
-
-  <section class="section-head">
-    <h2>Hasil Analisis</h2>
-    <span class="muted" id="tokenName">Belum ada token</span>
-  </section>
-
-  <section class="grid">
-    <div class="card">
-      <div class="metric-label">Holder Unik</div>
-      <div class="metric" id="holders">—</div>
-      <div class="metric-detail" id="holdersDetail">Menunggu scan</div>
-    </div>
-    <div class="card">
-      <div class="metric-label">Kepemilikan Dev</div>
-      <div class="metric" id="devSupply">UNKNOWN</div>
-      <div class="metric-detail" id="devDetail">Belum terverifikasi</div>
-    </div>
-    <div class="card">
-      <div class="metric-label">Top 10 Pemilik</div>
-      <div class="metric" id="top10">—</div>
-      <div class="metric-detail" id="top10Detail">Menunggu scan</div>
-    </div>
-    <div class="card">
-      <div class="metric-label">Skor Pasar</div>
-      <div class="metric" id="score">—</div>
-      <div class="metric-detail" id="scoreDetail">Bukan prediksi profit</div>
-    </div>
-  </section>
-
+<main class="wrap">
   <section class="panel">
-    <h2>Detail Token</h2>
-    <div class="data-row"><span>Alamat mint</span><strong id="mintDisplay">—</strong></div>
-    <div class="data-row"><span>Market cap / FDV</span><strong id="marketCap">—</strong></div>
-    <div class="data-row"><span>Likuiditas</span><strong id="liquidity">—</strong></div>
-    <div class="data-row"><span>Volume 24 jam</span><strong id="volume">—</strong></div>
-    <div class="data-row"><span>Umur pair</span><strong id="pairAge">—</strong></div>
-    <div class="data-row"><span>Skor risiko</span><strong id="riskLabel">Belum dihitung</strong></div>
-    <div class="scorebar" style="margin-top:12px">
-      <div id="scoreFill" class="scorefill"></div>
+    <div class="controls">
+      <input id="mintInput" spellcheck="false"
+        placeholder="Tempel alamat mint Solana...">
+      <button id="scanBtn">SCAN TOKEN</button>
     </div>
-  </section>
 
-  <section class="panel">
-    <div class="section-head" style="margin-top:0">
-      <h2>Identifikasi Wallet Dev</h2>
-      <button id="explorerBtn" class="secondary small-btn" disabled>
-        Buka Solscan
-      </button>
-    </div>
-    <div id="devStatus" class="status warn">
-      Wallet Dev belum dianalisis.
-    </div>
-    <div class="data-row"><span>Kandidat wallet</span><strong id="devWallet">UNKNOWN</strong></div>
-    <div class="data-row"><span>Dasar identifikasi</span><strong id="devReason">Belum ada bukti</strong></div>
-    <div class="data-row"><span>Mint authority</span><strong id="mintAuthority">UNKNOWN</strong></div>
-    <div class="data-row"><span>Freeze authority</span><strong id="freezeAuthority">UNKNOWN</strong></div>
-    <p class="muted">
-      Pembayar transaksi awal atau mint authority tidak otomatis sama dengan
-      pemilik proyek. Identifikasi ini bersifat indikatif.
+    <p class="hint">
+      Market: DexScreener. Holder: Helius RPC.
+      API key pada halaman publik dapat dilihat pengunjung.
     </p>
-  </section>
 
-  <section class="panel">
-    <h2>10 Pemilik Teratas</h2>
-    <p class="muted">
-      Persentase dihitung dari saldo wallet yang berhasil diambil.
-      Akun pool, vault, dan wallet terkait belum otomatis dikecualikan.
-    </p>
-    <div id="holderList" class="token-list">
-      <div class="muted">Belum ada data holder.</div>
+    <div id="status" role="status">
+      Masukkan alamat mint lalu tekan Scan.
     </div>
   </section>
 
-  <section class="section-head">
-    <h2>Token yang Sedang Dipromosikan</h2>
-    <button id="refreshBtn" class="secondary small-btn">Muat ulang</button>
-  </section>
-  <div id="trending" class="token-list">
-    <div class="card muted">Tekan Muat ulang untuk mencari token.</div>
-  </div>
+  <section id="result" class="token hide" style="margin-top:16px">
+    <div class="tokenhead">
+      <div>
+        <h2 id="tokenName">Token</h2>
+        <div id="tokenMint" class="small"></div>
+      </div>
+      <div id="riskPill" class="pill warn">Menunggu data</div>
+    </div>
 
-  <div class="footer">
-    SOLANA RADAR PRO · Data dapat terlambat, tidak lengkap, atau gagal diambil.
-    Selalu verifikasi sebelum mengambil keputusan.
-  </div>
+    <div class="grid">
+      <div class="metric"><div class="label">Market cap / FDV</div><div id="marketCap" class="value">—</div></div>
+      <div class="metric"><div class="label">Likuiditas</div><div id="liquidity" class="value">—</div></div>
+      <div class="metric"><div class="label">Volume 1 jam</div><div id="volume" class="value">—</div></div>
+      <div class="metric"><div class="label">Perubahan 5 menit</div><div id="change5m" class="value">—</div></div>
+      <div class="metric"><div class="label">Holder unik</div><div id="holders" class="value">UNKNOWN</div><div id="holdersNote" class="note">Menunggu data on-chain</div></div>
+      <div class="metric"><div class="label">Kepemilikan Dev</div><div id="devPct" class="value">UNKNOWN</div><div id="devNote" class="note">Belum terverifikasi</div></div>
+      <div class="metric"><div class="label">Top 10 pemilik</div><div id="top10" class="value">UNKNOWN</div></div>
+      <div class="metric"><div class="label">Skor pasar</div><div id="score" class="value">UNKNOWN</div><div class="note">Heuristik 0–100</div></div>
+    </div>
+
+    <h3 class="sectiontitle">10 holder terbesar yang terdeteksi</h3>
+    <div id="holderList" class="small">Belum ada data.</div>
+    <p id="dataFoot" class="foot">Analisis belum selesai.</p>
+  </section>
+
+  <p class="foot">
+    Catatan: data holder dapat parsial jika API membatasi request.
+    Skor bukan audit keamanan atau saran membeli.
+  </p>
 </main>
 
 <script>
 "use strict";
 
-/*
- * KONFIGURASI
- * Buat API key Helius baru dan masukkan di bawah.
- * API key browser terlihat oleh pengunjung situs.
- */
-const HELIUS_API_KEY = "MASUKKAN_API_KEY_HELIUS_DI_SINI";
-const HELIUS_RPC =
-  "https://mainnet.helius-rpc.com/?api-key=" +
+// Ganti dengan API key Helius BARU milikmu.
+// Jangan tempel API key ke chat. Untuk website publik, gunakan backend/proxy.
+const HELIUS_API_KEY = "be6a3daf-b21a-482d-8ba9-21f3e97b405f";
+const RPC_URL = "https://mainnet.helius-rpc.com/?api-key=" +
   encodeURIComponent(HELIUS_API_KEY);
-
-const DEX_TOKEN_URL = "https://api.dexscreener.com/latest/dex/tokens/";
-const DEX_BOOST_URL = "https://api.dexscreener.com/token-boosts/latest/v1";
+const DEX_URL = "https://api.dexscreener.com/latest/dex/tokens/";
 
 const $ = id => document.getElementById(id);
+const txt = (id, value) => $(id).textContent = value;
+const money = n => Number.isFinite(Number(n))
+  ? new Intl.NumberFormat("en-US", {
+      style: "currency", currency: "USD", maximumFractionDigits: 0
+    }).format(Number(n)) : "—";
+const percent = n => Number.isFinite(n) ? n.toFixed(2) + "%" : "UNKNOWN";
+const shortAddr = s => s ? s.slice(0,5) + "…" + s.slice(-5) : "Unknown";
 
-let activeMint = "";
-let scanBusy = false;
-
-function setStatus(message, type = "") {
-  $("status").textContent = message;
-  $("status").className = "status" + (type ? " " + type : "");
+function setStatus(message, error=false) {
+  txt("status", message);
+  $("status").className = error ? "error" : "";
 }
 
-function setDevStatus(message, type = "warn") {
-  $("devStatus").textContent = message;
-  $("devStatus").className = "status" + (type ? " " + type : "");
-}
-
-function fmtNumber(n, digits = 2) {
-  if (!Number.isFinite(Number(n))) return "UNKNOWN";
-  return Number(n).toLocaleString("en-US", {
-    maximumFractionDigits: digits
-  });
-}
-
-function fmtUSD(n) {
-  if (!Number.isFinite(Number(n)) || Number(n) < 0) return "UNKNOWN";
-  return "$" + Number(n).toLocaleString("en-US", {
-    maximumFractionDigits: 2
-  });
-}
-
-function shortAddress(address) {
-  if (!address) return "UNKNOWN";
-  return address.length > 14
-    ? address.slice(0, 6) + "…" + address.slice(-5)
-    : address;
-}
-
-function explorerUrl(address) {
-  return "https://solscan.io/account/" + encodeURIComponent(address);
+function validMint(s) {
+  return /^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(s);
 }
 
 async function rpc(method, params) {
-  if (
-    !HELIUS_API_KEY ||
-    HELIUS_API_KEY === "be6a3daf-b21a-482d-8ba9-21f3e97b405f"
-  ) {
-    throw new Error("Masukkan API key Helius baru di konfigurasi index.html.");
+  if (!HELIUS_API_KEY ||
+      HELIUS_API_KEY === "MASUKKAN_API_KEY_HELIUS_DI_SINI") {
+    throw Error("Isi API key Helius pada const HELIUS_API_KEY.");
   }
 
-  const response = await fetch(HELIUS_RPC, {
+  const response = await fetch(RPC_URL, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: {"Content-Type":"application/json"},
     body: JSON.stringify({
-      jsonrpc: "2.0",
-      id: "solana-radar-pro",
-      method,
-      params
+      jsonrpc:"2.0", id:"radar-pro", method, params
     })
   });
 
-  if (!response.ok) {
-    throw new Error("Helius HTTP " + response.status);
-  }
-
-  const data = await response.json();
-
-  if (data.error) {
-    throw new Error(data.error.message || "Helius RPC error");
-  }
-
-  return data.result;
+  if (!response.ok) throw Error("Helius HTTP " + response.status);
+  const body = await response.json();
+  if (body.error) throw Error(body.error.message || "Helius RPC error");
+  return body.result;
 }
 
-function validMint(mint) {
-  // Pemeriksaan format dasar; validasi kriptografis penuh dilakukan RPC.
-  return typeof mint === "string" &&
-    /^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(mint);
-}
+async function getMarketData(mint) {
+  const r = await fetch(DEX_URL + encodeURIComponent(mint));
+  if (!r.ok) throw Error("DexScreener HTTP " + r.status);
 
-function resetResults(mint) {
-  $("tokenName").textContent = "Memindai…";
-  $("mintDisplay").textContent = mint;
-  $("holders").textContent = "…";
-  $("holdersDetail").textContent = "Mengambil akun token";
-  $("devSupply").textContent = "UNKNOWN";
-  $("devDetail").textContent = "Menganalisis transaksi awal";
-  $("top10").textContent = "…";
-  $("top10Detail").textContent = "Mengambil saldo";
-  $("score").textContent = "…";
-  $("scoreDetail").textContent = "Mengambil data pasar";
-  $("marketCap").textContent = "UNKNOWN";
-  $("liquidity").textContent = "UNKNOWN";
-  $("volume").textContent = "UNKNOWN";
-  $("pairAge").textContent = "UNKNOWN";
-  $("riskLabel").textContent = "Belum dihitung";
-  $("scoreFill").style.width = "0%";
-  $("devWallet").textContent = "UNKNOWN";
-  $("devReason").textContent = "Sedang dianalisis";
-  $("mintAuthority").textContent = "UNKNOWN";
-  $("freezeAuthority").textContent = "UNKNOWN";
-  $("holderList").replaceChildren();
-  $("explorerBtn").disabled = true;
-  setDevStatus("Memeriksa transaksi awal dan otoritas mint.");
-}
+  const j = await r.json();
+  const pairs = (j.pairs || []).filter(
+    p => (p.chainId || "").toLowerCase() === "solana"
+  );
 
-async function fetchDexData(mint) {
-  const response = await fetch(DEX_TOKEN_URL + encodeURIComponent(mint));
-  if (!response.ok) throw new Error("DexScreener HTTP " + response.status);
-
-  const data = await response.json();
-  const pairs = (data.pairs || [])
-    .filter(pair => pair.chainId === "solana")
-    .sort((a, b) =>
-      Number(b.liquidity?.usd || 0) - Number(a.liquidity?.usd || 0)
-    );
-
+  pairs.sort((a,b) =>
+    (Number(b.liquidity?.usd)||0) - (Number(a.liquidity?.usd)||0)
+  );
   return pairs[0] || null;
 }
 
-async function fetchTokenAccounts(mint) {
+async function getSupply(mint) {
+  const value = (await rpc("getTokenSupply",[mint]))?.value;
+  if (!value) throw Error("Supply token tidak ditemukan.");
+
+  return {
+    decimals: Number(value.decimals),
+    ui: Number(value.uiAmountString)
+  };
+}
+
+async function fetchTokenAccounts(mint, decimals) {
   const owners = new Map();
-  let page = 1;
-  const maxPages = 100;
   let complete = false;
+  let pagesScanned = 0;
   let accountsSeen = 0;
 
-  while (page <= maxPages) {
-    const result = await rpc("getTokenAccounts", [{
-      mint,
-      page,
-      limit: 1000,
-      displayOptions: {}
-    }]);
+  for (let page=1; page<=100; page++) {
+    // Helius enhanced RPC: params harus berupa OBJEK.
+    const result = await rpc("getTokenAccounts", {
+      mint: mint,
+      page: page,
+      limit: 1000
+    });
 
-    const accounts = result?.token_accounts || [];
+    if (!Array.isArray(result?.token_accounts)) {
+      throw Error("Format respons getTokenAccounts tidak dikenal.");
+    }
+
+    const accounts = result.token_accounts;
+    pagesScanned = page;
+
     if (!accounts.length) {
       complete = true;
       break;
     }
 
+    accountsSeen += accounts.length;
+
     for (const account of accounts) {
       const owner = account.owner || account.ownerAddress;
-      if (!owner) continue;
+      const raw = Number(account.amount);
 
-      // Helius getTokenAccounts umumnya memberikan amount dalam unit mentah.
-      const rawAmount = Number(account.amount ?? 0);
-      const decimals = Number(account.decimals ?? 0);
+      if (!owner || !Number.isFinite(raw) || raw <= 0) continue;
 
-      if (!Number.isFinite(rawAmount) || rawAmount <= 0) continue;
-
-      const amount = rawAmount / Math.pow(10, decimals);
-      if (!Number.isFinite(amount) || amount <= 0) continue;
-
+      const amount = raw / Math.pow(10, decimals);
       owners.set(owner, (owners.get(owner) || 0) + amount);
-      accountsSeen++;
     }
 
-    page++;
     if (accounts.length < 1000) {
       complete = true;
       break;
     }
+
+    await new Promise(resolve => setTimeout(resolve, 120));
   }
 
-  return {
-    holders: [...owners.entries()]
-      .map(([owner, amount]) => ({ owner, amount }))
-      .sort((a, b) => b.amount - a.amount),
-    complete,
-    pagesScanned: page - 1,
-    accountsSeen
-  };
+  const holders = [...owners.entries()]
+    .map(([owner,amount]) => ({owner,amount}))
+    .sort((a,b) => b.amount-a.amount);
+
+  return {holders,complete,pagesScanned,accountsSeen};
 }
 
-async function fetchSupply(mint) {
-  const result = await rpc("getTokenSupply", [
-    mint,
-    { commitment: "confirmed" }
+async function findLikelyCreator(mint) {
+  let before = null;
+  let oldest = null;
+
+  // Heuristik terbatas, bukan bukti identitas Dev.
+  for (let i=0; i<5; i++) {
+    const params = [mint,{limit:1000}];
+    if (before) params[1].before = before;
+
+    const signatures = await rpc("getSignaturesForAddress",params);
+    if (!Array.isArray(signatures) || !signatures.length) break;
+
+    oldest = signatures[signatures.length-1];
+    if (signatures.length < 1000) break;
+
+    before = oldest.signature;
+  }
+
+  if (!oldest?.signature) return null;
+
+  const tx = await rpc("getTransaction",[
+    oldest.signature,
+    {encoding:"jsonParsed",maxSupportedTransactionVersion:0}
   ]);
 
-  const value = result?.value;
-  if (!value) throw new Error("Data supply tidak tersedia.");
+  const keys = tx?.transaction?.message?.accountKeys;
+  if (!Array.isArray(keys) || !keys.length) return null;
 
-  const supply = Number(value.uiAmountString ?? value.uiAmount);
-  if (!Number.isFinite(supply) || supply <= 0) {
-    throw new Error("Total supply tidak valid.");
-  }
-
-  return {
-    supply,
-    decimals: Number(value.decimals ?? 0)
-  };
+  return typeof keys[0] === "string" ? keys[0] : keys[0].pubkey;
 }
 
-async function fetchMintAuthorities(mint) {
-  const result = await rpc("getAccountInfo", [
-    mint,
-    { encoding: "jsonParsed", commitment: "confirmed" }
-  ]);
-
-  const info = result?.value?.data?.parsed?.info;
-  if (!info) return { mintAuthority: null, freezeAuthority: null };
-
-  return {
-    mintAuthority: info.mintAuthority || null,
-    freezeAuthority: info.freezeAuthority || null
-  };
-}
-
-/*
- * Telusuri riwayat transaksi mint.
- * Bila batas riwayat tercapai, hasil tidak boleh dianggap sebagai
- * transaksi pembuatan token yang sudah dipastikan.
- */
-async function getEarliestMintTransaction(mint) {
-  let before;
-  let earliestSignature = null;
-  let pages = 0;
-  let historyComplete = false;
-  const maxPages = 30;
-
-  while (pages < maxPages) {
-    const config = { limit: 1000, commitment: "finalized" };
-    if (before) config.before = before;
-
-    const signatures = await rpc("getSignaturesForAddress", [mint, config]);
-    if (!Array.isArray(signatures) || signatures.length === 0) {
-      historyComplete = true;
-      break;
-    }
-
-    earliestSignature = signatures[signatures.length - 1].signature;
-    before = earliestSignature;
-    pages++;
-
-    if (signatures.length < 1000) {
-      historyComplete = true;
-      break;
-    }
-  }
-
-  if (!earliestSignature) return null;
-
-  const tx = await rpc("getTransaction", [
-    earliestSignature,
-    {
-      encoding: "jsonParsed",
-      commitment: "finalized",
-      maxSupportedTransactionVersion: 0
-    }
-  ]);
-
-  if (!tx?.transaction?.message) return null;
-
-  return {
-    signature: earliestSignature,
-    transaction: tx,
-    historyComplete,
-    pagesScanned: pages
-  };
-}
-
-function extractDevCandidates(txData) {
-  const tx = txData?.transaction;
-  const message = tx?.transaction?.message;
-  if (!message) return [];
-
-  const candidates = new Map();
-
-  function add(address, reason, confidence) {
-    if (!address || typeof address !== "string") return;
-    const old = candidates.get(address);
-    if (!old || confidence > old.confidence) {
-      candidates.set(address, { wallet: address, reason, confidence });
-    }
-  }
-
-  const keys = message.accountKeys || [];
-  const feePayer = keys[0]?.pubkey || keys[0];
-  add(feePayer, "Pembayar transaksi tertua yang ditemukan", 45);
-
-  const instructions = [
-    ...(message.instructions || []),
-    ...((tx.meta?.innerInstructions || []).flatMap(
-      item => item.instructions || []
-    ))
-  ];
-
-  for (const ix of instructions) {
-    const info = ix?.parsed?.info || {};
-    const type = String(ix?.parsed?.type || "").toLowerCase();
-
-    if (type.includes("initializemint") && info.mintAuthority) {
-      add(info.mintAuthority, "Mint authority saat inisialisasi", 75);
-    }
-  }
-
-  return [...candidates.values()].sort(
-    (a, b) => b.confidence - a.confidence
-  );
-}
-
-async function identifyDevWallet(mint) {
-  try {
-    const creation = await getEarliestMintTransaction(mint);
-    if (!creation) {
-      return {
-        status: "UNKNOWN",
-        reason: "Transaksi awal tidak ditemukan."
-      };
-    }
-
-    const candidates = extractDevCandidates(creation.transaction);
-
-    if (!creation.historyComplete) {
-      return {
-        status: "UNKNOWN",
-        reason: "Riwayat terlalu panjang; transaksi pembuatan belum dipastikan.",
-        candidates,
-        signature: creation.signature
-      };
-    }
-
-    if (!candidates.length) {
-      return {
-        status: "UNKNOWN",
-        reason: "Tidak ditemukan kandidat wallet dari transaksi awal.",
-        signature: creation.signature
-      };
-    }
-
-    return {
-      status: "CANDIDATES_FOUND",
-      candidates,
-      signature: creation.signature,
-      reason: "Kandidat berasal dari transaksi tertua yang ditemukan."
-    };
-  } catch (error) {
-    return { status: "UNKNOWN", reason: error.message };
-  }
-}
-
-function renderHolders(holders, supply, complete) {
-  const list = $("holderList");
-  list.replaceChildren();
-
-  if (!holders.length) {
-    list.textContent = "Data holder tidak tersedia.";
-    return;
-  }
-
-  holders.slice(0, 10).forEach((holder, index) => {
-    const row = document.createElement("div");
-    row.className = "token-item";
-
-    const left = document.createElement("div");
-    const title = document.createElement("strong");
-    title.textContent = "#" + (index + 1) + " " + shortAddress(holder.owner);
-
-    const link = document.createElement("a");
-    link.href = explorerUrl(holder.owner);
-    link.target = "_blank";
-    link.rel = "noopener noreferrer";
-    link.textContent = "Lihat wallet";
-
-    left.append(title, link);
-
-    const right = document.createElement("div");
-    right.style.textAlign = "right";
-
-    const balance = document.createElement("strong");
-    balance.textContent = fmtNumber(holder.amount, 4);
-
-    const percent = document.createElement("div");
-    percent.className = "muted";
-    percent.textContent = fmtNumber(holder.amount / supply * 100, 2) + "% supply";
-
-    right.append(balance, percent);
-    row.append(left, right);
-    list.append(row);
-  });
-
-  $("top10Detail").textContent = complete
-    ? "Berdasarkan semua akun yang berhasil dipindai"
-    : "PERKIRAAN: pemindaian holder mencapai batas halaman";
-}
-
-function calculateMarketScore(pair, holderCount, top10Percent) {
-  if (!pair) return null;
-
-  const liquidity = Number(pair.liquidity?.usd || 0);
-  const volume = Number(pair.volume?.h24 || 0);
-  const marketCap = Number(pair.marketCap || pair.fdv || 0);
-
-  // Skor heuristik, bukan model prediksi harga atau audit keamanan.
+function calculateScore(liquidity,volume,holderCount,top10) {
   let score = 0;
 
-  score += Math.min(25, Math.log10(Math.max(1, liquidity)) * 3.5);
-  score += Math.min(20, Math.log10(Math.max(1, volume)) * 3.0);
-  score += Math.min(20, holderCount > 0 ? Math.log10(holderCount + 1) * 8 : 0);
+  score += liquidity >= 50000 ? 25 :
+           liquidity >= 20000 ? 19 :
+           liquidity >= 10000 ? 12 :
+           liquidity >= 5000 ? 6 : 0;
 
-  if (marketCap > 0 && liquidity > 0) {
-    const ratio = liquidity / marketCap;
-    score += Math.min(15, ratio * 100);
-  }
+  score += volume >= 200000 ? 25 :
+           volume >= 50000 ? 19 :
+           volume >= 10000 ? 12 :
+           volume >= 1000 ? 5 : 0;
 
-  if (Number.isFinite(top10Percent)) {
-    score += Math.max(0, 20 * (1 - top10Percent / 100));
-  }
+  score += holderCount >= 1000 ? 25 :
+           holderCount >= 500 ? 20 :
+           holderCount >= 100 ? 14 :
+           holderCount >= 30 ? 8 : 2;
 
-  return Math.max(0, Math.min(100, Math.round(score)));
+  score += top10 < 20 ? 25 :
+           top10 < 35 ? 19 :
+           top10 < 50 ? 11 :
+           top10 < 70 ? 4 : 0;
+
+  return Math.max(0,Math.min(100,score));
 }
 
-function renderDevResult(dev, holders, supply) {
-  if (!dev || dev.status !== "CANDIDATES_FOUND") {
-    $("devWallet").textContent = "UNKNOWN";
-    $("devReason").textContent = dev?.reason || "Tidak ada bukti cukup";
-    $("devSupply").textContent = "UNKNOWN";
-    $("devDetail").textContent = "Wallet Dev belum terverifikasi";
-    setDevStatus(dev?.reason || "Identifikasi belum berhasil.", "warn");
+function renderHolders(holders,supply) {
+  const box = $("holderList");
+  box.replaceChildren();
+
+  if (!holders.length) {
+    box.textContent = "Data holder belum tersedia.";
     return;
   }
 
-  const candidate = dev.candidates[0];
-  $("devWallet").textContent = shortAddress(candidate.wallet);
-  $("devReason").textContent = candidate.reason;
-  $("devSupply").textContent = "UNKNOWN";
-  $("devDetail").textContent = "Kandidat Dev — bukan identitas pasti";
+  holders.slice(0,10).forEach((holder,index) => {
+    const row = document.createElement("div");
+    row.className = "holderrow";
 
-  const matchingHolder = holders.find(h => h.owner === candidate.wallet);
+    const address = document.createElement("span");
+    address.className = "addr";
+    address.textContent = (index+1) + ". " + shortAddr(holder.owner);
 
-  if (matchingHolder && supply > 0) {
-    const percent = matchingHolder.amount / supply * 100;
-    $("devSupply").textContent = fmtNumber(percent, 2) + "%";
-    $("devDetail").textContent = "Saldo kandidat saat ini; bukan bukti identitas";
-  } else {
-    $("devDetail").textContent = "Saldo kandidat tidak cocok dengan data holder";
-  }
+    const amount = document.createElement("strong");
+    amount.textContent = supply > 0
+      ? percent(holder.amount/supply*100) : "—";
 
-  setDevStatus(
-    "Kandidat wallet ditemukan. Tingkat indikasi: " +
-    candidate.confidence + "/100. Ini bukan probabilitas ilmiah atau verifikasi identitas.",
-    "warn"
-  );
-
-  $("explorerBtn").disabled = false;
-  $("explorerBtn").onclick = () =>
-    window.open(explorerUrl(candidate.wallet), "_blank", "noopener");
+    row.append(address,amount);
+    box.append(row);
+  });
 }
 
-async function scanToken(mint) {
-  if (scanBusy) return;
+async function scan() {
+  const mint = $("mintInput").value.trim();
+
   if (!validMint(mint)) {
-    setStatus("Alamat mint tidak valid. Periksa kembali alamat Solana.", "error");
+    setStatus("Alamat mint Solana tidak valid.",true);
     return;
   }
 
-  scanBusy = true;
-  activeMint = mint;
   $("scanBtn").disabled = true;
-  resetResults(mint);
-  setStatus("Memindai blockchain dan data pasar. Tunggu sampai selesai.");
+  $("result").classList.remove("hide");
+
+  ["marketCap","liquidity","volume","change5m"].forEach(id=>txt(id,"—"));
+  ["holders","devPct","top10","score"].forEach(id=>txt(id,"UNKNOWN"));
+  txt("holdersNote","Menunggu data on-chain");
+  txt("devNote","Belum terverifikasi");
+  txt("holderList","Mengambil data…");
+  txt("dataFoot","Analisis berjalan.");
+  $("riskPill").className = "pill warn";
+  txt("riskPill","Analisis berjalan");
+
+  let market=null, supply=null, data=null, creator=null;
+  const errors=[];
 
   try {
-    const [dexResult, supplyResult, holderResult, authorityResult, devResult] =
-      await Promise.allSettled([
-        fetchDexData(mint),
-        fetchSupply(mint),
-        fetchTokenAccounts(mint),
-        fetchMintAuthorities(mint),
-        identifyDevWallet(mint)
-      ]);
+    market = await getMarketData(mint);
 
-    const pair = dexResult.status === "fulfilled" ? dexResult.value : null;
-    const supplyData = supplyResult.status === "fulfilled" ? supplyResult.value : null;
-    const holderData = holderResult.status === "fulfilled" ? holderResult.value : null;
-    const authorities = authorityResult.status === "fulfilled"
-      ? authorityResult.value : null;
-    const dev = devResult.status === "fulfilled" ? devResult.value : null;
-
-    if (dexResult.status === "rejected") {
-      console.warn("DexScreener:", dexResult.reason);
+    if (market) {
+      txt("tokenName",(market.baseToken?.name||"Token")+
+        " ("+(market.baseToken?.symbol||"—")+")");
+      txt("marketCap",money(market.marketCap ?? market.fdv));
+      txt("liquidity",money(market.liquidity?.usd));
+      txt("volume",money(market.volume?.h1));
+      txt("change5m",Number.isFinite(Number(market.priceChange?.m5))
+        ? Number(market.priceChange.m5).toFixed(2)+"%" : "—");
+    } else {
+      txt("tokenName","Token Solana");
+      errors.push("Pair tidak ditemukan di DexScreener.");
     }
-    if (supplyResult.status === "rejected") {
-      console.warn("Supply:", supplyResult.reason);
-    }
-    if (holderResult.status === "rejected") {
-      console.warn("Holder:", holderResult.reason);
-    }
+  } catch(e) {
+    txt("tokenName","Token Solana");
+    errors.push("Market: "+e.message);
+  }
 
-    $("mintDisplay").textContent = mint;
-    $("mintDisplay").title = mint;
+  txt("tokenMint",mint);
+  setStatus("Mengambil supply dan holder dari Helius…");
 
-    if (pair) {
-      $("tokenName").textContent =
-        (pair.baseToken?.name || "Token") +
-        " (" + (pair.baseToken?.symbol || "UNKNOWN") + ")";
+  try {
+    supply = await getSupply(mint);
+    data = await fetchTokenAccounts(mint,supply.decimals);
 
-      $("marketCap").textContent = fmtUSD(pair.marketCap || pair.fdv);
-      $("liquidity").textContent = fmtUSD(pair.liquidity?.usd);
-      $("volume").textContent = fmtUSD(pair.volume?.h24);
+    if (!data.holders.length) {
+      txt("holders","0");
+      txt("holdersNote","RPC mengembalikan 0 akun.");
+      txt("holderList","Tidak ada akun holder yang dikembalikan.");
+      errors.push("Tidak ada akun holder dari Helius.");
+    } else {
+      txt("holders",data.holders.length.toLocaleString("en-US"));
+      txt("holdersNote",data.complete
+        ? "Pagination selesai"
+        : "Hasil parsial: batas halaman tercapai");
 
-      if (pair.pairCreatedAt) {
-        const ageHours = Math.max(
-          0, (Date.now() - Number(pair.pairCreatedAt)) / 3600000
-        );
-        $("pairAge").textContent = ageHours < 48
-          ? fmtNumber(ageHours, 1) + " jam"
-          : fmtNumber(ageHours / 24, 1) + " hari";
+      const topAmount = data.holders.slice(0,10)
+        .reduce((sum,h)=>sum+h.amount,0);
+      const topPercent = supply.ui > 0
+        ? topAmount/supply.ui*100 : NaN;
+
+      txt("top10",percent(topPercent));
+      renderHolders(data.holders,supply.ui);
+
+      if (!data.complete) {
+        errors.push("Data holder hanya parsial.");
       }
-    } else {
-      $("tokenName").textContent = "Data pair belum tersedia";
+
+      setStatus("Memeriksa transaksi awal untuk perkiraan wallet Dev…");
+
+      try {
+        creator = await findLikelyCreator(mint);
+
+        if (creator) {
+          const devHolder = data.holders.find(h=>h.owner===creator);
+
+          if (devHolder) {
+            txt("devPct",percent(devHolder.amount/supply.ui*100));
+            txt("devNote","Perkiraan wallet transaksi awal, bukan bukti identitas Dev.");
+          } else {
+            txt("devPct","0.00%");
+            txt("devNote","Wallet fee payer awal tidak terlihat memegang token saat ini; Dev belum terverifikasi.");
+          }
+        } else {
+          txt("devPct","UNKNOWN");
+          txt("devNote","Wallet transaksi awal tidak dapat diidentifikasi.");
+        }
+      } catch(e) {
+        txt("devPct","UNKNOWN");
+        txt("devNote","Pemeriksaan transaksi awal gagal.");
+        errors.push("Identifikasi Dev: "+e.message);
+      }
+
+      if (data.complete && Number.isFinite(topPercent)) {
+        const score = calculateScore(
+          Number(market?.liquidity?.usd)||0,
+          Number(market?.volume?.h1)||0,
+          data.holders.length,
+          topPercent
+        );
+
+        txt("score",score+"/100");
+
+        if (score>=70) {
+          $("riskPill").className="pill";
+          txt("riskPill","Indikator pasar relatif kuat");
+        } else if (score>=45) {
+          $("riskPill").className="pill warn";
+          txt("riskPill","Perlu pemeriksaan lanjut");
+        } else {
+          $("riskPill").className="pill bad";
+          txt("riskPill","Indikator pasar lemah");
+        }
+      } else {
+        txt("score","UNKNOWN");
+        $("riskPill").className="pill warn";
+        txt("riskPill","Data holder parsial");
+      }
     }
-
-    if (supplyData && holderData) {
-      const holders = holderData.holders;
-      const top10Balance = holders.slice(0, 10)
-        .reduce((sum, holder) => sum + holder.amount, 0);
-      const top10Percent = top10Balance / supplyData.supply * 100;
-
-      $("holders").textContent = fmtNumber(holders.length, 0);
-      $("holdersDetail").textContent = holderData.complete
-        ? "Pemilik unik dari akun yang ditemukan"
-        : "PERKIRAAN — batas halaman tercapai";
-
-      $("top10").textContent = fmtNumber(top10Percent, 2) + "%";
-      renderHolders(holders, supplyData.supply, holderData.complete);
-      renderDevResult(dev, holders, supplyData.supply);
-
-      const score = calculateMarketScore(pair, holders.length, top10Percent);
-
-      $("score").textContent = score === null ? "UNKNOWN" : score + "/100";
-      $("scoreDetail").textContent = score === null
-        ? "Data pasar belum tersedia"
-        : "Indikator heuristik, bukan jaminan";
-      $("scoreFill").style.width = (score ?? 0) + "%";
-
-      $("riskLabel").textContent = score === null
-        ? "Belum dihitung"
-        : score >= 70
-          ? "Indikator pasar relatif kuat"
-          : score >= 45
-            ? "Indikator pasar sedang"
-            : "Indikator pasar lemah";
-
-      const partial = !holderData.complete;
-      setStatus(
-        partial
-          ? "Scan selesai sebagian. Holder dan Top 10 adalah perkiraan karena batas pemindaian."
-          : "Scan selesai. Tetap periksa hasil dan risiko secara manual.",
-        partial ? "warn" : ""
-      );
-    } else {
-      $("holders").textContent = "UNKNOWN";
-      $("holdersDetail").textContent = "Gagal mengambil holder atau supply";
-      $("top10").textContent = "UNKNOWN";
-      $("top10Detail").textContent = "Tidak cukup data";
-      $("score").textContent = "UNKNOWN";
-      setStatus(
-        "Sebagian data gagal diambil. Periksa API key, batas permintaan, dan console browser.",
-        "error"
-      );
-      renderDevResult(dev, [], 0);
-    }
-
-    if (authorities) {
-      $("mintAuthority").textContent =
-        authorities.mintAuthority || "Tidak ada / null";
-      $("freezeAuthority").textContent =
-        authorities.freezeAuthority || "Tidak ada / null";
-    }
-  } catch (error) {
-    console.error(error);
-    setStatus("Scan gagal: " + error.message, "error");
-  } finally {
-    scanBusy = false;
-    $("scanBtn").disabled = false;
+  } catch(e) {
+    errors.push("On-chain: "+e.message);
+    txt("holders","UNKNOWN");
+    txt("holdersNote",e.message);
+    txt("devPct","UNKNOWN");
+    txt("top10","UNKNOWN");
+    txt("score","UNKNOWN");
+    txt("holderList","Holder gagal dimuat: "+e.message);
+    $("riskPill").className="pill warn";
+    txt("riskPill","Data belum lengkap");
   }
+
+  const notes=[];
+  if (supply) notes.push("Total supply: "+
+    supply.ui.toLocaleString("en-US",{maximumFractionDigits:4}));
+  if (data) notes.push("Akun dipindai: "+data.accountsSeen+
+    "; halaman: "+data.pagesScanned+
+    "; "+(data.complete?"pagination selesai":"hasil parsial"));
+  if (errors.length) notes.push("Catatan: "+errors.join(" | "));
+
+  txt("dataFoot",notes.join(" "));
+  setStatus(errors.length
+    ? "Scan selesai dengan catatan: "+errors.join(" | ")
+    : "Scan selesai. Periksa akurasi data sebelum trading.");
+
+  $("scanBtn").disabled=false;
 }
 
-async function loadTrending() {
-  const target = $("trending");
-  target.replaceChildren();
-
-  const loading = document.createElement("div");
-  loading.className = "card muted";
-  loading.textContent = "Mengambil daftar token terbaru…";
-  target.append(loading);
-
-  try {
-    const response = await fetch(DEX_BOOST_URL);
-    if (!response.ok) throw new Error("HTTP " + response.status);
-
-    const tokens = await response.json();
-    const solTokens = (Array.isArray(tokens) ? tokens : [])
-      .filter(t => t.chainId === "solana" && t.tokenAddress)
-      .slice(0, 12);
-
-    target.replaceChildren();
-
-    if (!solTokens.length) {
-      target.textContent = "Tidak ada token Solana dari endpoint ini.";
-      return;
-    }
-
-    solTokens.forEach(token => {
-      const row = document.createElement("div");
-      row.className = "token-item";
-
-      const info = document.createElement("div");
-      const title = document.createElement("strong");
-      title.textContent = token.description || shortAddress(token.tokenAddress);
-
-      const address = document.createElement("div");
-      address.className = "muted";
-      address.textContent = shortAddress(token.tokenAddress);
-
-      info.append(title, address);
-
-      const button = document.createElement("button");
-      button.className = "small-btn";
-      button.textContent = "Scan";
-      button.onclick = () => {
-        $("mintInput").value = token.tokenAddress;
-        scanToken(token.tokenAddress);
-        window.scrollTo({ top: 0, behavior: "smooth" });
-      };
-
-      row.append(info, button);
-      target.append(row);
-    });
-  } catch (error) {
-    target.replaceChildren();
-    const errorBox = document.createElement("div");
-    errorBox.className = "status error";
-    errorBox.textContent = "Gagal memuat daftar token: " + error.message;
-    target.append(errorBox);
-  }
-}
-
-$("scanBtn").addEventListener("click", () => {
-  scanToken($("mintInput").value.trim());
+$("scanBtn").addEventListener("click",scan);
+$("mintInput").addEventListener("keydown",e=>{
+  if(e.key==="Enter") scan();
 });
-
-$("mintInput").addEventListener("keydown", event => {
-  if (event.key === "Enter") scanToken($("mintInput").value.trim());
-});
-
-$("refreshBtn").addEventListener("click", loadTrending);
-
-loadTrending();
 </script>
 </body>
-</html>
+                                                                   </html>
