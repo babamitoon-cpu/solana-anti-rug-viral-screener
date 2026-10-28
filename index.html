@@ -112,6 +112,30 @@ tbody tr:not(.analysis-row) td:nth-child(7){grid-column:1/-1!important}
 .hero-coin-caption{position:absolute;bottom:12px;left:12px;right:12px;text-align:center;font-size:11px;letter-spacing:1.2px;color:#c6d9dd;text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 @media(max-width:700px){.hero-coin-wrap{width:190px}.hero-coin-fallback{font-size:58px}.hero-orb{min-height:210px}}
 
+
+/* USER DESIGN: white background, black Comic font, 14px everywhere, green buttons/links */
+:root{color-scheme:light!important;--bg:#FFFFFF!important;--panel:#FFFFFF!important;--panel2:#F7F9F7!important;--line:#E1E5E1!important;--text:#111111!important;--muted:#333333!important;--green:#16A34A!important;--accent:#16A34A!important;--red:#B91C1C!important;--yellow:#92400E!important;--blue:#166534!important}
+*,*::before,*::after{font-family:"Comic Sans MS","Comic Sans",Chalkboard, cursive!important;font-size:14px!important;box-sizing:border-box}
+html,body{background:#FFFFFF!important;color:#111111!important}
+body{background:#FFFFFF!important;letter-spacing:normal!important}
+header{background:#FFFFFF!important;border-bottom:1px solid #E1E5E1!important;backdrop-filter:none!important}
+main{background:#FFFFFF!important}
+.panel,.stat,.analysis-card,.analysis-metric,.hero,.source-chip,.source-strip,.tablewrap,tbody tr:not(.analysis-row),.field input,.field select,.analysis-note{background:#FFFFFF!important;color:#111111!important;border-color:#E1E5E1!important;box-shadow:none!important}
+.hero:after{display:none!important}
+.brand h1,.brand p,.hero h2,.hero p,.hero em,.hero-chips span,.eyebrow,.source-label,.source-chip,.source-chip b,.stat span,.stat strong,.stat small,.panel h2,.field label,.rule,.rule b,.toolbar h2,.status,th,td,.token b,.token small,.analysis-title,.analysis-metric span,.analysis-metric b,.analysis-note,.details,.details strong,.foot,.empty,.pro-tag{color:#111111!important}
+.hero-chips span{background:#FFFFFF!important;border-color:#E1E5E1!important}
+button,.btn,.smallbtn,button.ghost,.analysis-links button{background:#16A34A!important;color:#FFFFFF!important;border:1px solid #16A34A!important;box-shadow:none!important}
+a,.analysis-links a{color:#16A34A!important;border-color:#16A34A!important}
+.logo{background:#16A34A!important;color:#FFFFFF!important;box-shadow:none!important}
+.orb-core{background:#16A34A!important;color:#FFFFFF!important;box-shadow:none!important}
+.orb-label{background:#FFFFFF!important;color:#111111!important;border-color:#16A34A!important}
+.pass{background:#DCFCE7!important;color:#166534!important}.fail{background:#FEE2E2!important;color:#991B1B!important}.unknown{background:#FEF3C7!important;color:#92400E!important}
+th{background:#F7F9F7!important}td{border-bottom-color:#E1E5E1!important}
+tbody tr:not(.analysis-row){background:#FFFFFF!important;border-color:#E1E5E1!important}
+.progress{background:#E5E7EB!important}.progress span{background:#16A34A!important;box-shadow:none!important}
+.notice{background:#FFFBEB!important;color:#111111!important;border-color:#FDE68A!important}
+@media(prefers-color-scheme:dark){html,body{background:#FFFFFF!important;color:#111111!important}}
+
 </style>
 </head>
 <body>
@@ -147,7 +171,8 @@ tbody tr:not(.analysis-row) td:nth-child(7){grid-column:1/-1!important}
    <div class="rule"><span>Bundle holdings maksimum</span><b>10%</b></div>
    <div class="rule"><span>Sniper holdings maksimum</span><b>10%</b></div>
    <div class="rule"><span>20 pembeli pertama maksimum</span><b>10%</b></div>
-   <div class="rule"><span>Top 10 holder maksimum</span><b>30%</b></div>
+   <div class="rule"><span>Top 10 akun token maksimum</span><b>30%</b></div>
+   <div class="rule"><span>Top 20 akun token maksimum</span><b>—</b></div>
    <h2 style="margin-top:23px">Skor indikatif</h2>
    <div class="details">Momentum harga 25 · volume/transaksi 20 · likuiditas 20 · buyer activity 15 · stabilitas pair 10 · kelengkapan data 10.</div>
    <p class="details">Skor tidak dapat mengesampingkan filter wajib. Data yang tidak tersedia tidak dianggap nol risiko.</p>
@@ -176,6 +201,9 @@ tbody tr:not(.analysis-row) td:nth-child(7){grid-column:1/-1!important}
 <script>
 const API='https://api.dexscreener.com';
 let allPairs=[];
+const RPC='https://api.mainnet-beta.solana.com';
+const chainData={};
+const chainLoading=new Set();
 const $=id=>document.getElementById(id);
 const money=n=>Number.isFinite(Number(n))?new Intl.NumberFormat('en-US',{style:'currency',currency:'USD',maximumFractionDigits: n>=1000?0:2}).format(n):'—';
 const short=n=>{n=Number(n);if(!Number.isFinite(n))return'—';return n>=1e9?(n/1e9).toFixed(2)+'B':n>=1e6?(n/1e6).toFixed(2)+'M':n>=1e3?(n/1e3).toFixed(1)+'K':n.toLocaleString('en-US',{maximumFractionDigits:2})};
@@ -236,6 +264,40 @@ function updateHeroCoin(){
 function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 function applyFilters(){render()}
 function copyMint(value){if(!value){alert('Contract address belum tersedia');return}if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(value).then(()=>alert('Contract address disalin')).catch(()=>prompt('Salin contract address:',value))}else{prompt('Salin contract address:',value)}}
+async function rpc(method, params){
+ const r=await fetch(RPC,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({jsonrpc:'2.0',id:1,method,params})});
+ if(!r.ok) throw new Error('Solana RPC HTTP '+r.status);
+ const j=await r.json(); if(j.error) throw new Error(j.error.message||'Solana RPC error'); return j.result;
+}
+function pctText(v){return Number.isFinite(v)?v.toFixed(2)+'%':'UNKNOWN'}
+async function loadChainData(mint,force=false){
+ if(!mint||(!force&&chainData[mint])||chainLoading.has(mint))return;
+ chainLoading.add(mint);
+ try{
+  const [supplyRes,largestRes,accountRes]=await Promise.all([
+   rpc('getTokenSupply',[mint,{commitment:'confirmed'}]),
+   rpc('getTokenLargestAccounts',[mint,{commitment:'confirmed'}]),
+   rpc('getAccountInfo',[mint,{encoding:'jsonParsed',commitment:'confirmed'}])
+  ]);
+  const total=Number(supplyRes?.value?.amount);
+  const accounts=largestRes?.value||[];
+  const top10=accounts.slice(0,10).reduce((s,a)=>s+Number(a.amount||0),0);
+  const top20=accounts.slice(0,20).reduce((s,a)=>s+Number(a.amount||0),0);
+  const info=accountRes?.value?.data?.parsed?.info||{};
+  chainData[mint]={
+   supply:total,
+   decimals:supplyRes?.value?.decimals,
+   top10Percent:total>0?top10/total*100:null,
+   top20Percent:total>0?top20/total*100:null,
+   top10Count:Math.min(10,accounts.length),top20Count:Math.min(20,accounts.length),
+   mintAuthority:Object.prototype.hasOwnProperty.call(info,'mintAuthority')?info.mintAuthority:undefined,
+   freezeAuthority:Object.prototype.hasOwnProperty.call(info,'freezeAuthority')?info.freezeAuthority:undefined,
+   note:'Largest token accounts are not necessarily distinct wallets. Owner aggregation is not available from this RPC response.'
+  };
+ }catch(e){chainData[mint]={error:e.message};}
+ finally{chainLoading.delete(mint);render()}
+}
+function requestChain(mint){delete chainData[mint];loadChainData(mint,true)}
 function render(){
  const minMc=Number($('minMc').value||0), minLiq=Number($('minLiq').value||0), minH=Number($('minHolders').value||0), maxAge=Number($('maxAge').value||60), minScore=Number($('minScore').value||75);
  // Tampilkan semua pair hasil discovery agar tabel tidak kosong hanya karena filter ketat.
@@ -287,14 +349,23 @@ function render(){
   '<div class="analysis-metric"><span>Perubahan 5 menit</span><b>'+change5+'</b></div>'+
   '<div class="analysis-metric"><span>Beli / Jual 1 jam</span><b>'+short(buys)+' / '+short(sells)+'</b></div>'+
   '<div class="analysis-metric"><span>Rasio jumlah transaksi</span><b>'+buySell+'</b></div>'+
-  '<div class="analysis-metric"><span>Holder unik</span><b>UNKNOWN · perlu API holder</b></div>'+
-  '<div class="analysis-metric"><span>Top 10 holder / bundle / sniper</span><b>UNKNOWN · belum terverifikasi</b></div></div>'+
+  '<div class="analysis-metric"><span>Holder unik</span><b>UNKNOWN · RPC standar tidak memberi hitungan lengkap</b></div>'+
+  '<div class="analysis-metric"><span>Konsentrasi top 10 akun</span><b>'+(chainData[mint]&&chainData[mint].top10Percent!=null?pctText(chainData[mint].top10Percent):'UNKNOWN · belum dimuat')+'</b><small>akun token, bukan wallet terverifikasi</small></div>'+
+  '<div class="analysis-metric"><span>Konsentrasi top 20 akun</span><b>'+(chainData[mint]&&chainData[mint].top20Percent!=null?pctText(chainData[mint].top20Percent):'UNKNOWN · belum dimuat')+'</b><small>akun token, bukan wallet terverifikasi</small></div>'+
+  '<div class="analysis-metric"><span>Dev Supply %</span><b>UNKNOWN · creator belum terverifikasi</b><small>tidak diasumsikan 0%</small></div>'+
+  '<div class="analysis-metric"><span>Creator / dev wallet</span><b>UNKNOWN</b></div>'+
+  '<div class="analysis-metric"><span>Mint authority</span><b>'+(chainData[mint]?(chainData[mint].error?'UNKNOWN · RPC gagal':chainData[mint].mintAuthority===null?'NONE / null':chainData[mint].mintAuthority||'UNKNOWN'):'UNKNOWN · belum dimuat')+'</b></div>'+
+  '<div class="analysis-metric"><span>Freeze authority</span><b>'+(chainData[mint]?(chainData[mint].error?'UNKNOWN · RPC gagal':chainData[mint].freezeAuthority===null?'NONE / null':chainData[mint].freezeAuthority||'UNKNOWN'):'UNKNOWN · belum dimuat')+'</b></div>'+
+  '<div class="analysis-metric"><span>Bundle / sniper / 20 pembeli awal</span><b>UNKNOWN · perlu analisis riwayat transaksi</b></div></div>'+
   '<div class="analysis-note"><strong>Interpretasi otomatis:</strong><ul style="margin:5px 0 0;padding-left:18px">'+notes+'</ul><div style="margin-top:6px">Skor pasar indikatif '+score+'/100; bukan skor keamanan. Pair umur '+Math.floor(age)+' menit. FDV/market cap berasal dari data pair publik yang tersedia.</div></div>'+
   '<div class="analysis-grid" style="margin-top:8px">'+
   '<div class="analysis-metric"><span>Mint / freeze authority</span><b>UNKNOWN</b></div><div class="analysis-metric"><span>Keamanan likuiditas</span><b>UNKNOWN</b></div><div class="analysis-metric"><span>Dev reputation</span><b>UNKNOWN</b></div><div class="analysis-metric"><span>X / TikTok viral</span><b>NOT SCORED</b></div></div>'+
-  '<div class="analysis-links"><a href="'+escapeHtml(url)+'" target="_blank" rel="noopener">Buka DEX Screener ↗</a><a href="'+escapeHtml(solscan)+'" target="_blank" rel="noopener">Buka token di Solscan ↗</a><button class="ghost smallbtn" onclick="copyMint(&quot;'+escapeHtml(mint)+'&quot;)">Salin contract address</button></div>'+
-  '<div class="details" style="margin-top:8px">Status: market filter dapat dievaluasi dari data yang tersedia, tetapi belum bisa disebut LOLOS FINAL. Holder count, top 10 holder, 20 pembeli pertama, bundle, sniper, otoritas mint/freeze, creator/dev, dan keamanan likuiditas harus diverifikasi oleh sumber analitik tambahan. UNKNOWN bukan berarti lolos.</div></div></td></tr>';
+  '<div class="analysis-links"><a href="'+escapeHtml(url)+'" target="_blank" rel="noopener">Buka DEX Screener ↗</a><a href="'+escapeHtml(solscan)+'" target="_blank" rel="noopener">Buka token di Solscan ↗</a><button class="ghost smallbtn" onclick="copyMint(&quot;'+escapeHtml(mint)+'&quot;)">Salin contract address</button><button class="ghost smallbtn" onclick="requestChain(&quot;'+escapeHtml(mint)+'&quot;)">'+(chainData[mint]?'Muat ulang data on-chain':'Ambil data on-chain')+'</button></div>'+
+  '<div class="details" style="margin-top:8px">Data market berasal dari DEX Screener. Top 10/20 dihitung dari saldo akun token terbesar yang dikembalikan RPC, bukan agregasi wallet unik. Dev Supply tetap UNKNOWN sampai creator/dev dapat diidentifikasi dengan bukti. Holder count lengkap, pembeli pertama, bundle, sniper, reputasi dev, dan keamanan likuiditas belum diverifikasi. UNKNOWN bukan berarti lolos.</div></div></td></tr>';
  }).join('');
+ // Automatically request on-chain account/supply/authority data for the 10 highest-ranked visible candidates.
+ // RPC limits/CORS can cause UNKNOWN; user can retry per token from its detail card.
+ rows.slice(0,10).forEach(({p})=>{const mint=p.baseToken?.address;if(mint&&!chainData[mint]&&!chainLoading.has(mint))loadChainData(mint)});
 }
 $('maxAge').addEventListener('change',applyFilters);
 </script>
